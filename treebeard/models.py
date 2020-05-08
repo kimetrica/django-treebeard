@@ -49,7 +49,7 @@ class Node(models.Model):
                 field.get_internal_type() == 'ForeignKey' and
                 field.name != 'parent'
             ):
-                foreign_keys[field.name] = field.rel.to
+                foreign_keys[field.name] = field.remote_field.model
         return foreign_keys
 
     @classmethod

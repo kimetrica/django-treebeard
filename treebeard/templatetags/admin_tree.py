@@ -16,12 +16,13 @@ try:
     from django.contrib.admin.utils import lookup_field, display_for_field
 except ImportError:  # < Django 1.8
     from django.contrib.admin.util import lookup_field, display_for_field
-from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.core.exceptions import ObjectDoesNotExist
 from django.template import Library
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+
+from treebeard.admin import get_empty_value_display
 
 
 if sys.version < '3':
@@ -57,7 +58,7 @@ def get_result_and_row_class(cl, field_name, result):
     try:
         f, attr, value = lookup_field(field_name, result, cl.model_admin)
     except ObjectDoesNotExist:
-        result_repr = EMPTY_CHANGELIST_VALUE
+        result_repr = get_empty_value_display(cl)
     else:
         if f is None:
             if field_name == 'action_checkbox':
@@ -74,14 +75,15 @@ def get_result_and_row_class(cl, field_name, result):
             if isinstance(value, (datetime.date, datetime.time)):
                 row_class = mark_safe(' class="nowrap"')
         else:
-            if isinstance(f.rel, models.ManyToOneRel):
+            if isinstance(f.remote_field, models.ManyToOneRel):
                 field_val = getattr(result, f.name)
                 if field_val is None:
-                    result_repr = EMPTY_CHANGELIST_VALUE
+                    result_repr = get_empty_value_display(cl)
                 else:
                     result_repr = field_val
             else:
-                result_repr = display_for_field(value, f)
+                empty_value_display = getattr(attr, 'empty_value_display', get_empty_value_display(cl))
+                result_repr = display_for_field(value, f, empty_value_display)
             if isinstance(f, (models.DateField, models.TimeField,
                               models.ForeignKey)):
                 row_class = mark_safe(' class="nowrap"')

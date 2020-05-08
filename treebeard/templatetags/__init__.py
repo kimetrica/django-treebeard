@@ -21,12 +21,12 @@ def display_for_value(value, boolean=False):  # pragma: no cover
     """ Added for compatibility with django 1.4, copied from django trunk.
     """
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+    from treebeard.admin import get_empty_value_display
 
     if boolean:
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return get_empty_value_display()
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
