@@ -2,7 +2,7 @@ import datetime
 import decimal
 
 from django.template import Variable, VariableDoesNotExist
-from django.utils import formats, timezone, six
+from django.utils import formats, timezone
 from django.utils.encoding import smart_text
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
@@ -31,7 +31,7 @@ def display_for_value(value, boolean=False):  # pragma: no cover
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
+    elif isinstance(value, (int, decimal.Decimal, float)):
         return formats.number_format(value)
     else:
         return smart_text(value)
@@ -47,5 +47,5 @@ def format_html(format_string, *args, **kwargs):  # pragma: no cover
     """
     args_safe = map(conditional_escape, args)
     kwargs_safe = dict([(k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs)])
+                        kwargs.items()])
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
